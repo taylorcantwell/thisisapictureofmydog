@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Dog {
+  id        Int       @id @default(autoincrement())
+  name      String
+  breed     String?
+  imageUrl  String    @map("image_url")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  dogLikes DogLike[]
+  comments Comment[]
+
+  @@map("dogs")
+}
+
+model DogLike {
+  id        Int       @id @default(autoincrement())
+  dogId     Int
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  dog Dog @relation(fields: [dogId], references: [id])
+
+  @@map("dog_likes")
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  dogId     Int
+  avatarId  Int?
+  content   String
+  name      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  dog          Dog           @relation(fields: [dogId], references: [id])
+  avatar       Avatars?      @relation(fields: [avatarId], references: [id])
+  commentLikes CommentLike[]
+
+  @@map("comments")
+}
+
+model Avatars {
+  id        Int       @id @default(autoincrement())
+  url       String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  Comment   Comment[]
+
+  @@map("avatars")
+}
+
+model CommentLike {
+  id        Int       @id @default(autoincrement())
+  commentId Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  comment Comment @relation(fields: [commentId], references: [id])
+
+  @@map("comment_likes")
+}
