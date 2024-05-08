@@ -28,7 +28,7 @@ import { submitCommentAction } from './submitCommentAction';
 type CommentsProps = {
   comments: Array<Comment>;
   hasMore: boolean;
-  page: number;
+  page: string;
 };
 
 export function CommentsList(props: CommentsProps) {
@@ -38,7 +38,7 @@ export function CommentsList(props: CommentsProps) {
   >(props.comments, (state, comment) => [comment, ...state]);
 
   return (
-    <div>
+    <div className="flex-grow">
       {optimisticComments.length > 0 && (
         <>
           <List optimisticComments={optimisticComments} />
@@ -123,10 +123,11 @@ interface CommentListItem extends Comment {
 
 interface FormProps {
   addOptimisticComment: (action: CommentListItem) => void;
-  currentPage: number;
+  currentPage: string;
 }
 
 export function Form(props: FormProps) {
+  console.log('🚀 ~ Form ~ props:', props);
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useFormState(submitCommentAction, {
     errors: {},
@@ -142,7 +143,8 @@ export function Form(props: FormProps) {
         const name = formData.get('name') as string | null;
         const content = formData.get('content') as string | null;
 
-        if (props.currentPage === 1 && name && content) {
+        // Todo: updates then immediately reverts 💩
+        if (props.currentPage === '1' && name && content) {
           props.addOptimisticComment({
             id: Math.random() * 1000,
             name,
@@ -214,6 +216,7 @@ function Pagination(props: PaginationProps) {
   const isOnFirstPage = page === 1;
 
   const setNextPage = () => {
+    // How do i get loading state in here.... 😵‍💫
     router.push(`?page=${nextPage}`);
     router.refresh();
   };
