@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Comments } from './_components/Comments';
 
 interface HomeProps {
-  searchParams: { page?: number };
+  searchParams: { page?: string };
 }
 
 export default function Home(props: HomeProps) {
@@ -36,7 +36,13 @@ export default function Home(props: HomeProps) {
             />
           </div>
 
-          <Comments page={props.searchParams.page} />
+          <Comments
+            page={
+              props.searchParams.page !== null
+                ? Number(props.searchParams.page)
+                : undefined
+            }
+          />
         </main>
 
         <Footer />

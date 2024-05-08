@@ -28,7 +28,7 @@ import { submitCommentAction } from './submitCommentAction';
 type CommentsProps = {
   comments: Array<Comment>;
   hasMore: boolean;
-  page: string;
+  page: number;
 };
 
 export function CommentsList(props: CommentsProps) {
@@ -123,11 +123,10 @@ interface CommentListItem extends Comment {
 
 interface FormProps {
   addOptimisticComment: (action: CommentListItem) => void;
-  currentPage: string;
+  currentPage: number;
 }
 
 export function Form(props: FormProps) {
-  console.log('🚀 ~ Form ~ props:', props);
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useFormState(submitCommentAction, {
     errors: {},
@@ -144,7 +143,7 @@ export function Form(props: FormProps) {
         const content = formData.get('content') as string | null;
 
         // Todo: updates then immediately reverts 💩
-        if (props.currentPage === '1' && name && content) {
+        if (props.currentPage === 1 && name && content) {
           props.addOptimisticComment({
             id: Math.random() * 1000,
             name,
