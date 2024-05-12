@@ -21,7 +21,7 @@ import {
 import { Textarea } from '@/ui/textarea';
 import { UserIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useOptimistic, useRef } from 'react';
+import { useOptimistic, useRef, useTransition } from 'react';
 import { useFormState } from 'react-dom';
 import { submitCommentAction } from './submitCommentAction';
 
@@ -68,19 +68,15 @@ function Comment(props: CommentProps) {
     <div className="flex items-start gap-4 w-full">
       <Avatar className="h-10 w-10">
         <AvatarImage alt={props.name} src="/placeholder-avatar.jpg" />
-
         <AvatarFallback>{props.name[0]}</AvatarFallback>
       </Avatar>
-
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <div className="font-medium">{props.name}</div>
-
           <div className="text-xs text-gray-500 dark:text-gray-400">
             2 days ago
           </div>
         </div>
-
         <p>{props.content}</p>
       </div>
     </div>
@@ -145,7 +141,7 @@ export function Form(props: FormProps) {
         // Todo: updates then immediately reverts 💩
         if (props.currentPage === 1 && name && content) {
           props.addOptimisticComment({
-            id: Math.random() * 1000,
+            id: 123,
             name,
             content,
             // Todo: use proper values
@@ -155,7 +151,7 @@ export function Form(props: FormProps) {
           });
         }
 
-        formAction(formData);
+        await formAction(formData);
         formRef.current?.reset();
       }}
       className="border border-teal-200 p-3 rounded-sm"
@@ -183,7 +179,6 @@ export function Form(props: FormProps) {
           )}
         </div>
       </div>
-
       <div className="flex justify-end mt-4">
         <Button className="bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400">
           Submit
@@ -208,6 +203,7 @@ interface PaginationProps {
 function Pagination(props: PaginationProps) {
   const router = useRouter();
   const params = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const page = params.get('page') ? parseInt(params.get('page') as string) : 1;
   const prevPage = page - 1;
@@ -215,14 +211,17 @@ function Pagination(props: PaginationProps) {
   const isOnFirstPage = page === 1;
 
   const setNextPage = () => {
-    // How do i get loading state in here.... 😵‍💫
-    router.push(`?page=${nextPage}`);
-    router.refresh();
+    startTransition(() => {
+      router.push(`?page=${nextPage}`);
+      router.refresh();
+    });
   };
 
   const setPreviousPage = () => {
-    router.push(`?page=${prevPage}`);
-    router.refresh();
+    startTransition(() => {
+      router.push(`?page=${prevPage}`);
+      router.refresh();
+    });
   };
 
   return (
@@ -230,40 +229,43 @@ function Pagination(props: PaginationProps) {
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            disabled={isOnFirstPage}
+            disabled={isOnFirstPage || isPending}
             onClick={setPreviousPage}
           />
         </PaginationItem>
-
         {page !== 1 && (
           <PaginationItem>
             <PaginationButton
-              disabled={isOnFirstPage}
+              disabled={isOnFirstPage || isPending}
               onClick={setPreviousPage}
             >
               {prevPage}
             </PaginationButton>
           </PaginationItem>
         )}
-
         <PaginationItem>
-          <PaginationButton isActive>{page}</PaginationButton>
+          <PaginationButton disabled={isPending} isActive>
+            {page}
+          </PaginationButton>
         </PaginationItem>
-
         <PaginationItem>
-          <PaginationButton disabled={!props.hasMore} onClick={setNextPage}>
+          <PaginationButton
+            disabled={!props.hasMore || isPending}
+            onClick={setNextPage}
+          >
             {nextPage}
           </PaginationButton>
         </PaginationItem>
-
         {props.hasMore && (
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
         )}
-
         <PaginationItem>
-          <PaginationNext disabled={!props.hasMore} onClick={setNextPage} />
+          <PaginationNext
+            disabled={!props.hasMore || isPending}
+            onClick={setNextPage}
+          />
         </PaginationItem>
       </PaginationContent>
     </PaginationUI>
@@ -281,13 +283,11 @@ function AvatarDropdownMenu(props: AvatarDropdownMenuProps) {
       <DropdownMenuTrigger asChild>
         <Avatar className="h-10 w-10">
           <AvatarImage alt="avatar" src="" />
-
           <AvatarFallback>
             <UserIcon className="h-6 w-6" />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent>
         {props.items.map((item) => (
           <Item key={item.id} {...item} />
@@ -307,7 +307,6 @@ function Item(props: ItemProps) {
     <DropdownMenuItem>
       <Avatar className="h-8 w-8">
         <AvatarImage alt="avatar" src={props.avatarUrl} />
-
         <AvatarFallback>
           <UserIcon className="h-5 w-5" />
         </AvatarFallback>

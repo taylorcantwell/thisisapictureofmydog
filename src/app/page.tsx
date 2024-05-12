@@ -26,7 +26,6 @@ export default function Home(props: HomeProps) {
                 </span>
               </Button>
             </div>
-
             <Image
               src="/dog.JPG"
               width={1170 / 3}
@@ -35,7 +34,6 @@ export default function Home(props: HomeProps) {
               className="rounded p-3 border border-teal-200 bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400"
             />
           </div>
-
           <Comments
             page={
               props.searchParams.page !== null
@@ -44,7 +42,6 @@ export default function Home(props: HomeProps) {
             }
           />
         </main>
-
         <Footer />
       </div>
     </div>
@@ -57,7 +54,6 @@ function Header() {
       <h1 className=" text-4xl text-center md:text-start md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 text-transparent bg-clip-text">
         This is a picture of my dog.
       </h1>
-
       <p className="text-2xl font-medium text-gray-600 dark:text-gray-400 mt-2">
         Her name is Lila.
       </p>
@@ -77,7 +73,6 @@ function Footer() {
             <ShareIcon className="h-5 w-5" />
             Share
           </a>
-
           <a
             className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
             href="#"
@@ -85,7 +80,6 @@ function Footer() {
             <TwitterIcon className="h-5 w-5" />
             Twitter
           </a>
-
           <a
             className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
             href="#"
